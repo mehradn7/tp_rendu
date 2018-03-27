@@ -41,8 +41,9 @@ public class DepthBuffer {
         if ((fragment.getX () >= 0) && (fragment.getX () < width) && (fragment.getY () >= 0) && (fragment.getY () < height)) {
 
             /* compléter */
+        	
 
-            return false;
+            return fragment.getAttribute(0) < this.buffer[fragment.getX()*width + fragment.getY()*height];
         } else {
             return false;
         }
@@ -55,6 +56,9 @@ public class DepthBuffer {
         if ((fragment.getX () >= 0) && (fragment.getX () < width) && (fragment.getY () >= 0) && (fragment.getY () < height)) {
 
             /* compléter */
+        	if (this.testFragment(fragment)){
+        		this.buffer[fragment.getX()*width + fragment.getY()*height] = fragment.getAttribute(0);
+        	}
 
         }
     }

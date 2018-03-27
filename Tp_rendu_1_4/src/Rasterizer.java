@@ -68,7 +68,7 @@ public class Rasterizer {
         int x2 = v2.getX ();
         int y2 = v2.getY ();
 
-	/* For now : just display the vertices*/
+	/* For now : just display the vertices
 	Fragment f = new Fragment (0,0);
 	int size = 2;
         for (int i = 0; i < v1.getNumAttributes (); i++) {
@@ -79,10 +79,10 @@ public class Rasterizer {
 			f.setPosition(x1+i,y1+j);
 			shader.shade (f);
 			}
-		}
+		} */
 
   
-        /* tracé d'un segment avec l'algo de Bresenham 
+        /* tracé d'un segment avec l'algo de Bresenham */
 	int numAttributes = v1.getNumAttributes ();
         Fragment fragment = new Fragment (0, 0); //, numAttributes);
         
@@ -137,7 +137,7 @@ public class Rasterizer {
                 shader.shade (fragment);
             }
 		}
-*/
+
 
     }
 
@@ -180,11 +180,45 @@ public class Rasterizer {
      */
     public void rasterizeFace (Fragment v1, Fragment v2, Fragment v3) {
 
-        Matrix C = makeBarycentricCoordsMatrix (v1, v2, v3);
+        try {
+			Matrix C = makeBarycentricCoordsMatrix (v1, v2, v3);
 
-        /* iterate over the triangle's bounding box */
+			/* iterate over the triangle's bounding box */
+			
+			/* Coordinates of the bounding box */
+			int x_min = Math.min(v1.getX(), Math.min(v2.getX(), v3.getX()));
+			int y_min = Math.min(v1.getY(), Math.min(v2.getY(), v3.getY()));
+			
+			int x_max = Math.max(v1.getX(), Math.max(v2.getX(), v3.getX()));
+			int y_max = Math.max(v1.getY(), Math.max(v2.getY(), v3.getY()));
+
+			for (int i=x_min; i<= x_max; i++){
+				for(int j = y_min; j<= y_max; j++){
+					Vector v = new Vector3(1, i, j);
+					Vector coordBary = C.multiply(v);
+					if (coordBary.get(0) >= 0 && coordBary.get(1) >= 0 && coordBary.get(2) >= 0){
+						/* The pixel is inside the bounding box */
+						Fragment frag = new Fragment(i, j);
+						interpolate3 (v1, v2, v3, frag, coordBary);
+						shader.shade(frag);
+					}
+				}
+			}
+			
+			
+			
+			
+		} catch (SizeMismatchException e) {
+			e.printStackTrace();
+		}
         
-	/* à compléter */
+        
+    }
 
-    }  
+	private void interpolate3(Fragment v1, Fragment v2, Fragment v3, Fragment frag, Vector coordBarycentriques) {
+		for (int k=0; k< frag.getNumAttributes(); k++){
+			frag.setAttribute(k, coordBarycentriques.get(0)*v1.getAttribute(k) + coordBarycentriques.get(1)*v2.getAttribute(k) + coordBarycentriques.get(2)*v3.getAttribute(k) );
+		}
+		
+	}  
 }
