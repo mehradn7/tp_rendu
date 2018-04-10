@@ -14,6 +14,8 @@ public class Renderer {
     static GraphicsWrapper screen;
     static Shader shader;
     static Transformation xform;
+    static Lighting lighting;
+    static boolean lightingEnabled; 
 
     static void init (String sceneFilename) throws Exception {
         scene = new Scene (sceneFilename);
@@ -31,6 +33,12 @@ public class Renderer {
                          scene.getCameraUp ());
 	xform.setProjection ();
         xform.setCalibration (scene.getCameraFocal (), scene.getScreenW (), scene.getScreenH ());
+
+	/* A decommenter pour le lighting */
+	/* lighting = new Lighting ();
+        lighting.addAmbientLight (scene.getAmbientI ());
+        double[] lightCoord = scene.getSourceCoord ();
+        lighting.addPointLight (lightCoord[0], lightCoord[1], lightCoord[2], scene.getSourceI ()); */
     }
 
     static Fragment[] projectVertices () {
@@ -50,7 +58,21 @@ public class Renderer {
             fragments[i] = new Fragment (x, y);
             fragments[i].setDepth (pVertex.get (2));
             fragments[i].setNormal (pNormal);
-            fragments[i].setColor (colors[3*i], colors[3*i+1], colors[3*i+2]);
+
+
+	   if (!lightingEnabled) {
+                fragments[i].setColor (colors[3*i], colors[3*i+1], colors[3*i+2]);
+            } else {
+                double[] color = new double[3];
+                color[0] = colors[3*i];
+                color[1] = colors[3*i+1];
+                color[2] = colors[3*i+2];
+                double material[] = scene.getMaterial ();
+                double[] litColor = lighting.applyLights (new Vector3 (vertices[i]), pNormal, color,
+                                                        scene.getCameraPosition (),
+                                                        material[0], material[1], material[2], material[3]);
+                fragments[i].setColor (litColor[0], litColor[1], litColor[2]);
+            }
         }
         } catch (SizeMismatchException e) {
             e.printStackTrace ();
@@ -89,6 +111,10 @@ public class Renderer {
         }
     }
 
+    public static void setLightingEnabled (boolean enabled) {
+        lightingEnabled = enabled;
+    }
+
     public static void wait (int sec) {
         try {
             Thread.sleep (sec * 1000);
@@ -121,6 +147,14 @@ public class Renderer {
         renderSolid ();
         screen.swapBuffers ();
         wait (3);
+
+	/* solid rendering, with lighting */
+        //screen.clearBuffer ();
+        //shader.reset ();
+        //setLightingEnabled (true);
+        //renderSolid ();
+        //screen.swapBuffers ();
+        //wait (3);
 
         screen.destroy ();
   	System.exit (0);
