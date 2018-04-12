@@ -196,7 +196,7 @@ public class Rasterizer {
 				for(int j = y_min; j<= y_max; j++){
 					Vector v = new Vector3(1, i, j);
 					Vector coordBary = C.multiply(v);
-					if (coordBary.get(0) >= 0 && coordBary.get(1) >= 0 && coordBary.get(2) >= 0){
+					if (coordBary.get(0) >= -0.00001 && coordBary.get(1) >= -0.00001 && coordBary.get(2) >= -0.00001){
 						/* The pixel is inside the bounding box */
 						Fragment frag = new Fragment(i, j);
 						interpolate3 (v1, v2, v3, frag, coordBary);

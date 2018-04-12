@@ -38,7 +38,7 @@ public class PerspectiveCorrectRasterizer extends Rasterizer {
 
                     Vector3 v = new Vector3 (1.0, (double)x, (double)y);
                     Vector bar = C.multiply (v);
-                    if ((bar.get (0) >= 0.0) && (bar.get (1) >= 0.0) && (bar.get (2) >= 0.0)) {
+                    if ((bar.get (0) >= -0.00001) && (bar.get (1) >= -0.00001) && (bar.get (2) >= -0.00001)) {
                         double oneOverZ = bar.get (0) / v1.getDepth () +
                                             bar.get (1) / v2.getDepth () +
                                             bar.get (2) / v3.getDepth ();

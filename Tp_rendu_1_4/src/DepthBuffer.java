@@ -42,7 +42,7 @@ public class DepthBuffer {
 
 			/* compléter */
 
-			return fragment.getAttribute(0) < this.buffer[fragment.getX() * width + fragment.getY()];
+			return fragment.getDepth() < this.buffer[fragment.getX() * height + fragment.getY()];
 		} else {
 			return false;
 		}
@@ -55,8 +55,7 @@ public class DepthBuffer {
 
 		/* compléter */
 		if (this.testFragment(fragment)) {
-			this.buffer[fragment.getX() * width + fragment.getY()] = fragment.getAttribute(0);
-			System.out.println("HAHA");
+			this.buffer[fragment.getX() * height + fragment.getY()] = fragment.getDepth();
 		}
 
 	}

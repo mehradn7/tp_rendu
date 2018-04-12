@@ -25,7 +25,8 @@ public class Renderer {
         //shader = new SimpleShader (screen);
         shader = new PainterShader (screen);
 
-        rasterizer = new Rasterizer (shader);
+        //rasterizer = new Rasterizer (shader);
+        rasterizer = new PerspectiveCorrectRasterizer (shader);
 
         xform = new Transformation ();
         xform.setLookAt (scene.getCameraPosition (),
@@ -35,13 +36,15 @@ public class Renderer {
         xform.setCalibration (scene.getCameraFocal (), scene.getScreenW (), scene.getScreenH ());
 
 	/* A decommenter pour le lighting */
-	/* lighting = new Lighting ();
+	 lighting = new Lighting ();
         lighting.addAmbientLight (scene.getAmbientI ());
         double[] lightCoord = scene.getSourceCoord ();
-        lighting.addPointLight (lightCoord[0], lightCoord[1], lightCoord[2], scene.getSourceI ()); */
+        lighting.addPointLight (lightCoord[0], lightCoord[1], lightCoord[2], scene.getSourceI ());
     }
 
     static Fragment[] projectVertices () {
+    	
+    	
         Vector[] vertices = mesh.getVertices ();
         Vector3[] normals = mesh.getNormals ();
         double[] colors = mesh.getColors ();
@@ -58,6 +61,14 @@ public class Renderer {
             fragments[i] = new Fragment (x, y);
             fragments[i].setDepth (pVertex.get (2));
             fragments[i].setNormal (pNormal);
+            
+            /* AJOUTE DEPUIS MOODLE */
+            double[] texCoords = mesh.getTextureCoordinates ();
+            if (texCoords != null) {
+                fragments[i].setAttribute (7, texCoords[2*i]);
+                fragments[i].setAttribute (8, texCoords[2*i+1]);
+            }
+            /* FIN AJOUT */
 
 
 	   if (!lightingEnabled) {
@@ -142,21 +153,44 @@ public class Renderer {
         wait (3);
 
         /* solid rendering, no lighting */
+        //screen.clearBuffer ();
+        //shader.reset ();
+        //renderSolid ();
+        //screen.swapBuffers ();
+        //wait (3);
+        
+        
+	/* solid rendering, with lighting */
         screen.clearBuffer ();
         shader.reset ();
+        setLightingEnabled (true);
         renderSolid ();
         screen.swapBuffers ();
         wait (3);
 
-	/* solid rendering, with lighting */
-        //screen.clearBuffer ();
-        //shader.reset ();
-        //setLightingEnabled (true);
-        //renderSolid ();
-        //screen.swapBuffers ();
-        //wait (3);
+        
+        /* AJOUTE DEPUIS MOODLE */
+        /* solid rendering, with texture */
+        screen.clearBuffer ();
+        TextureShader texShader = new TextureShader (screen);
+        texShader.setTexture ("data/world_map.jpg");
+        shader = texShader;
+        rasterizer.setShader (texShader);
+        setLightingEnabled (true);
+        renderSolid ();
+        screen.swapBuffers ();
+        wait (3);
 
+        /* solid rendering, with texture combined with base color*/
+        screen.clearBuffer ();
+        texShader.reset ();
+        texShader.setCombineWithBaseColor (true);
+        shader = texShader;
+        /* FIN AJOUT */
+        
         screen.destroy ();
+
+        
   	System.exit (0);
     }
 }

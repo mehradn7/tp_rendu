@@ -77,7 +77,7 @@ public class Lighting {
 					/* diffuse contribution : A COMPLETER */
 					double Id = light.params[3] * kd * normal.dot(l);
 					/* specular contribution : A COMPLETER */
-					double Is = light.params[3] * ks ; //PAS FINIIII
+					double Is = light.params[3] * ks * Math.pow(h.dot(normal), s);
 					I += Id + Is;
 				} catch (InstantiationException ex) {
 					/* should not reach */ } catch (SizeMismatchException ex) {

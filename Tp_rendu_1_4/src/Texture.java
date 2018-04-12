@@ -22,15 +22,15 @@ public class Texture {
     }
 
     /**
-     * Samples the texture at texture coordinates (u,v), using nearest neighboor interpolation
+     * Samples the texture at texture coordinates (u,v), using nearest neighbor interpolation
      * u and v and wrapped around to [0,1].
      */ 
     public Color sample (double u, double v) {
 
 
 	/* à compléter */
-
-
-        return new Color (0,0,0);
+    	int couleur = image.getRGB((int) (u*width)%width, (int) (v*height)%height);
+    	
+        return new Color (couleur);
     }
 }
